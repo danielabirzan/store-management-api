@@ -4,12 +4,13 @@ import com.danielabirzan.storemanagement.product.dto.ProductRequest;
 import com.danielabirzan.storemanagement.product.dto.ProductResponse;
 import com.danielabirzan.storemanagement.product.service.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -32,8 +33,11 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> findAll() {
-        return ResponseEntity.ok(productService.findAll());
+    public Page<ProductResponse> findAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return productService.findAll(PageRequest.of(page, size))
+                .map(ProductResponse::from);
     }
 
     @PatchMapping("/{id}/price")

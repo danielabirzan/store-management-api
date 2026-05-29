@@ -10,6 +10,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -81,23 +85,27 @@ class ProductServiceTest {
     }
 
     @Test
-    void findAll_whenProductsExist_returnsMappedList() {
+    void findAll_whenProductsExist_returnsPage() {
         Product p1 = persistedProduct(1L, "Milk", "1L", new BigDecimal("9.00"), 10);
         Product p2 = persistedProduct(2L, "Bread", "white", new BigDecimal("5.45"), 20);
-        when(productRepository.findAll()).thenReturn(List.of(p1, p2));
 
-        List<ProductResponse> responses = productService.findAll();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Product> productPage = new PageImpl<>(List.of(p1, p2));
+        when(productRepository.findAll(pageable)).thenReturn(productPage);
 
-        assertThat(responses).hasSize(2);
-        assertThat(responses).extracting(ProductResponse::name)
+        Page<Product> responses = productService.findAll(pageable);
+
+        assertThat(responses.getContent()).hasSize(2);
+        assertThat(responses.getContent()).extracting(Product::getName)
                 .containsExactly("Milk", "Bread");
     }
 
     @Test
-    void findAll_whenRepositoryEmpty_returnsEmptyList() {
-        when(productRepository.findAll()).thenReturn(List.of());
+    void findAll_whenRepositoryEmpty_returnsEmptyPage() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(productRepository.findAll(pageable)).thenReturn(Page.empty());
 
-        List<ProductResponse> responses = productService.findAll();
+        Page<Product> responses = productService.findAll(pageable);
 
         assertThat(responses).isEmpty();
     }

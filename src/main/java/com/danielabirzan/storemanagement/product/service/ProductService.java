@@ -4,10 +4,11 @@ import com.danielabirzan.storemanagement.product.dto.ProductRequest;
 import com.danielabirzan.storemanagement.product.dto.ProductResponse;
 import com.danielabirzan.storemanagement.product.model.Product;
 import com.danielabirzan.storemanagement.product.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -36,10 +37,8 @@ public class ProductService {
         return toResponse(product);
     }
 
-    public List<ProductResponse> findAll() {
-        return productRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<Product> findAll(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
 
     public ProductResponse changePrice(Long id, BigDecimal newPrice) {
