@@ -44,4 +44,10 @@ public class GlobalExceptionHandler {
         String detail = "Invalid value for parameter '" + ex.getName() + "'";
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleUnexpected(Exception ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+    }
 }
