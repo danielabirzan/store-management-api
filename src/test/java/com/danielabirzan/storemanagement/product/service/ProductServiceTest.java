@@ -2,6 +2,7 @@ package com.danielabirzan.storemanagement.product.service;
 
 import com.danielabirzan.storemanagement.product.dto.ProductRequest;
 import com.danielabirzan.storemanagement.product.dto.ProductResponse;
+import com.danielabirzan.storemanagement.product.exception.ProductNotFoundException;
 import com.danielabirzan.storemanagement.product.model.Product;
 import com.danielabirzan.storemanagement.product.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,11 +76,11 @@ class ProductServiceTest {
     }
 
     @Test
-    void findById_whenProductNotFound_throwsNoSuchElementException() {
+    void findById_whenProductNotFound_throwsProductNotFoundException() {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> productService.findById(99L))
-                .isInstanceOf(NoSuchElementException.class)
+                .isInstanceOf(ProductNotFoundException.class)
                 .hasMessageContaining("99");
     }
 
@@ -124,11 +124,11 @@ class ProductServiceTest {
     }
 
     @Test
-    void changePrice_whenProductNotFound_throwsNoSuchElementException() {
+    void changePrice_whenProductNotFound_throwsProductNotFoundException() {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> productService.changePrice(99L, new BigDecimal("7.50")))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ProductNotFoundException.class);
 
         verify(productRepository, never()).save(any());
     }
@@ -147,11 +147,11 @@ class ProductServiceTest {
     }
 
     @Test
-    void changeQuantity_whenProductNotFound_throwsNoSuchElementException() {
+    void changeQuantity_whenProductNotFound_throwsProductNotFoundException() {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> productService.changeQuantity(99L, 25))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ProductNotFoundException.class);
 
         verify(productRepository, never()).save(any());
     }
@@ -166,11 +166,11 @@ class ProductServiceTest {
     }
 
     @Test
-    void delete_whenProductNotFound_throwsNoSuchElementException() {
+    void delete_whenProductNotFound_throwsProductNotFoundException() {
         when(productRepository.existsById(99L)).thenReturn(false);
 
         assertThatThrownBy(() -> productService.delete(99L))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(ProductNotFoundException.class);
 
         verify(productRepository, never()).deleteById(anyLong());
     }
