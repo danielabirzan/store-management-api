@@ -78,4 +78,6 @@ Pagination on the list endpoint: `?page=0&size=10`.
 mvn test
 ```
 
-Unit tests cover the service layer (JUnit 5, Mockito, AssertJ). The `contextLoads` test verifies the full application context (including security configuration) starts without errors.
+Unit tests cover the service layer (JUnit 5, Mockito, AssertJ).
+Controller tests (@WebMvcTest) cover the endpoints, role-based access control, input validation, and exception-to-status mapping.
+The `contextLoads` test verifies the full application context (including security configuration) starts without errors.
