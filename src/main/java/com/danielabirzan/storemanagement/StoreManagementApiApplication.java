@@ -13,12 +13,13 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
 
 @SecurityScheme(
-		name = "basicAuth",
+		name = "bearerAuth",
 		type = SecuritySchemeType.HTTP,
-		scheme = "basic"
+		scheme = "bearer",
+		bearerFormat = "JWT"
 )
 @OpenAPIDefinition(
-		security = @SecurityRequirement(name = "basicAuth")
+		security = @SecurityRequirement(name = "bearerAuth")
 )
 @EnableConfigurationProperties(SecurityCredentials.class)
 @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
