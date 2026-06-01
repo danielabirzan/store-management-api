@@ -81,3 +81,10 @@ mvn test
 Unit tests cover the service layer (JUnit 5, Mockito, AssertJ).
 Controller tests (@WebMvcTest) cover the endpoints, role-based access control, input validation, and exception-to-status mapping.
 The `contextLoads` test verifies the full application context (including security configuration) starts without errors.
+
+## Additional work
+
+These features are implemented on dedicated branches:
+
+- **`feat/rate-limiting`** - limits requests per IP address (Bucket4j)
+- **`feat/jwt-auth`** - token-based authentication using JWT
