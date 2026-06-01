@@ -11,6 +11,7 @@ A REST API for managing a product catalog (CRUD), built with Spring Boot. Suppor
 - Spring Security (Basic Auth)
 - springdoc-openapi (Swagger UI)
 - Maven
+- Bucket4j (rate limiting)
 
 ## How to Run
 
@@ -49,6 +50,19 @@ Base path: `/api/products`
 
 Pagination on the list endpoint: `?page=0&size=10`.
 
+## Rate Limiting
+
+Requests are rate-limited per IP address using Bucket4j (token bucket algorithm). Each IP gets its own bucket; once it runs out, the API responds with `429 Too Many Requests` and a `ProblemDetail` body, consistent with the rest of the error handling.
+
+The filter runs before Spring Security (`Ordered.HIGHEST_PRECEDENCE`), so every request is rate-limited regardless of authentication, including unauthenticated ones, which could otherwise flood the login endpoint.
+
+| Property                      | Default | Description                      |
+|-------------------------------|---------|----------------------------------|
+| `rate-limit.capacity`         | 20      | max requests allowed per window  |
+| `rate-limit.duration-minutes` | 1       | length of the window, in minutes |
+
+With the defaults, each IP can make up to 20 requests per minute.
+
 ## Design Decisions
 
 ### Persistence
@@ -80,4 +94,5 @@ mvn test
 
 Unit tests cover the service layer (JUnit 5, Mockito, AssertJ).
 Controller tests (@WebMvcTest) cover the endpoints, role-based access control, input validation, and exception-to-status mapping.
+The rate limiting filter is unit-tested for allowing requests within the limit, returning 429 when exceeded, and tracking IPs independently.
 The `contextLoads` test verifies the full application context (including security configuration) starts without errors.
