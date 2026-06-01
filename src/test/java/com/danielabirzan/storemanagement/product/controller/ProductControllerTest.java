@@ -3,6 +3,7 @@ package com.danielabirzan.storemanagement.product.controller;
 import com.danielabirzan.storemanagement.product.dto.ProductResponse;
 import com.danielabirzan.storemanagement.product.exception.ProductNotFoundException;
 import com.danielabirzan.storemanagement.product.service.ProductService;
+import com.danielabirzan.storemanagement.security.JwtUtil;
 import com.danielabirzan.storemanagement.security.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ class ProductControllerTest {
 
     @MockitoBean
     private ProductService productService;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
 
     @BeforeEach
     void setUp() {
