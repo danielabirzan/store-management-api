@@ -8,7 +8,8 @@ A REST API for managing a product catalog (CRUD), built with Spring Boot. Suppor
 - Spring Boot 4
 - Spring Data JPA + Hibernate
 - H2 (in-memory database)
-- Spring Security (Basic Auth)
+- Spring Security (JWT authentication)
+- jjwt (JSON Web Token library)
 - springdoc-openapi (Swagger UI)
 - Maven
 
@@ -25,14 +26,41 @@ The application starts on port `8080`.
 
 ## Authentication
 
-The API uses HTTP Basic Auth with two in-memory users (demo only):
+The API uses JWT (JSON Web Token) authentication. There are two in-memory users (demo only):
 
 | Username | Password    | Role  | Access                   |
 |----------|-------------|-------|--------------------------|
 | `user`   | `userpass`  | USER  | GET                      |
 | `admin`  | `adminpass` | ADMIN | GET, POST, PATCH, DELETE |
 
-In Swagger UI, use the **Authorize** button to provide credentials.
+### Getting a token
+
+Send credentials to the login endpoint:
+
+```bash
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"adminpass"}'
+```
+
+The response contains a token:
+
+```json
+{"token":"eyJhbGciOiJIUzI1NiJ9..."}
+```
+
+### Using the token
+
+Send the token in the `Authorization` header on every request:
+
+```bash
+curl http://localhost:8080/api/products/1 \
+  -H "Authorization: Bearer <token>"
+```
+
+Tokens expire after 60 minutes (configurable via `jwt.expiration-minutes`).
+
+In Swagger UI, use the **Authorize** button and paste the token (without the `Bearer ` prefix).
 
 ## API Endpoints
 
@@ -69,7 +97,9 @@ Pagination on the list endpoint: `?page=0&size=10`.
 
 ### Security
 
-- **Basic Auth** for simplicity, satisfying the requirement for a basic authentication mechanism. Without HTTPS, credentials are only Base64-encoded (not encrypted), so in production it would require HTTPS.
+- **JWT authentication** for stateless, token-based access. After logging in once, the client sends a signed token on each request instead of credentials, so the server doesn't re-check the password on each request.
+- **Stateless session** (`SessionCreationPolicy.STATELESS`): the server keeps no session; the token itself carries the user's identity and role.
+- **Tokens signed with HMAC-SHA256** (HS256) using a secret key. The same key signs and verifies. In production the secret would not be committed - externalized via environment variable at minimum, ideally managed by a dedicated secrets manager.
 - **Password hashing with BCrypt**. Users are in-memory for this demo; in production they would be stored in the database.
 
 ## Testing
@@ -78,6 +108,6 @@ Pagination on the list endpoint: `?page=0&size=10`.
 mvn test
 ```
 
-Unit tests cover the service layer (JUnit 5, Mockito, AssertJ).
-Controller tests (@WebMvcTest) cover the endpoints, role-based access control, input validation, and exception-to-status mapping.
-The `contextLoads` test verifies the full application context (including security configuration) starts without errors.
+- Unit tests cover the service layer and JWT components (JUnit 5, Mockito, AssertJ).
+- Controller tests (@WebMvcTest) cover the endpoints, role-based access control, input validation, and exception-to-status mapping.
+- The `contextLoads` test verifies the full application context (including security configuration) starts without errors.
