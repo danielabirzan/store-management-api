@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -38,6 +39,13 @@ public class GlobalExceptionHandler {
         problem.setProperty("errors", errors);
 
         return problem;
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ProblemDetail handleMethodValidation(HandlerMethodValidationException ex) {
+        log.warn("Method parameter validation failed: {}", ex.getMessage());
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST, "Validation failed");
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
