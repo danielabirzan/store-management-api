@@ -93,10 +93,10 @@ class ProductServiceTest {
         Page<Product> productPage = new PageImpl<>(List.of(p1, p2));
         when(productRepository.findAll(pageable)).thenReturn(productPage);
 
-        Page<Product> responses = productService.findAll(pageable);
+        Page<ProductResponse> responses = productService.findAll(pageable);
 
         assertThat(responses.getContent()).hasSize(2);
-        assertThat(responses.getContent()).extracting(Product::getName)
+        assertThat(responses.getContent()).extracting(ProductResponse::name)
                 .containsExactly("Milk", "Bread");
     }
 
@@ -105,7 +105,7 @@ class ProductServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         when(productRepository.findAll(pageable)).thenReturn(Page.empty());
 
-        Page<Product> responses = productService.findAll(pageable);
+        Page<ProductResponse> responses = productService.findAll(pageable);
 
         assertThat(responses).isEmpty();
     }

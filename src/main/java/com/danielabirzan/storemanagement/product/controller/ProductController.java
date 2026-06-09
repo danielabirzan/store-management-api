@@ -37,11 +37,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public Page<ProductResponse> findAll(
+    public ResponseEntity<Page<ProductResponse>> findAll(
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "10") @Min(1) int size) {
-        return productService.findAll(PageRequest.of(page, size))
-                .map(ProductResponse::from);
+        return ResponseEntity.ok(productService.findAll(PageRequest.of(page, size)));
     }
 
     @PatchMapping("/{id}/price")

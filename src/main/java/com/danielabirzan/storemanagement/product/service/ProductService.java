@@ -37,8 +37,8 @@ public class ProductService {
         return toResponse(product);
     }
 
-    public Page<Product> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable);
+    public Page<ProductResponse> findAll(Pageable pageable) {
+        return productRepository.findAll(pageable).map(ProductResponse::from);
     }
 
     public ProductResponse changePrice(Long id, BigDecimal newPrice) {
