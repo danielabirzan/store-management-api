@@ -113,6 +113,20 @@ class ProductControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
+    void listProducts_negativePage_returns400() throws Exception {
+        mockMvc.perform(get("/api/products").param("page", "-1"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void listProducts_negativeSize_returns400() throws Exception {
+        mockMvc.perform(get("/api/products").param("size", "-1"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void createProduct_unauthenticated_returns401() throws Exception {
         mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -235,6 +249,27 @@ class ProductControllerTest {
         mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalid))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updatePrice_negativePrice_returns400() throws Exception {
+        mockMvc.perform(patch("/api/products/1/price").param("newPrice", "-1.00"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updatePrice_tooManyDecimals_returns400() throws Exception {
+        mockMvc.perform(patch("/api/products/1/price").param("newPrice", "9.999"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void updateQuantity_negativeQuantity_returns400() throws Exception {
+        mockMvc.perform(patch("/api/products/1/quantity").param("newQuantity", "-1"))
                 .andExpect(status().isBadRequest());
     }
 
